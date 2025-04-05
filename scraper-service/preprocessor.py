@@ -1,33 +1,18 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 import json
 import csv
-import uuid
 
 class JobDataPreprocessor:
-    """Class untuk preprocessing data pekerjaan dengan struktur yang lebih baik"""
-    
     def __init__(self):
-        # Initialize skill dictionaries
-        self.skills_dict = {
-            'skills': {
-                'python', 'java', 'javascript', 'typescript', 'php', 'go', 'rust',
-                'c++', 'c#', 'ruby', 'swift', 'kotlin', 'scala', 'perl', 'r',
-                'dart', 'lua', 'haskell', 'erlang', 'julia',                 'react', 'angular', 'vue', 'django', 'flask', 'spring', 
-                'laravel', 'express', 'next.js', 'nuxt.js', 'flutter',
-                'tensorflow', 'pytorch', 'keras', 'symfony', 'rails',
-                'svelte', 'gatsby', 'fastapi', 'nest.js','git', 'docker', 'kubernetes', 'jenkins', 'jira', 'aws', 
-                'azure', 'gcp', 'terraform', 'ansible', 'nginx', 'linux',
-                'webpack', 'babel', 'vite', 'ci/cd', 'github actions',
-                'gitlab', 'bitbucket', 'prometheus', 'grafana', 'elk'
-                'mysql', 'postgresql', 'mongodb', 'redis', 'elasticsearch',
-                'cassandra', 'oracle', 'sql server', 'sqlite', 'dynamodb',
-                'mariadb', 'neo4j', 'graphql', 'couchdb', 'firebase'
-            }
-        }
+        """
+        Initialize JobDataPreprocessor object
+
+        This is a no-op, but it's included for consistency with other classes.
+        """
+        pass
         
-    
     def _extract_keywords(self, text: str) -> List[str]:
         """Extract important keywords from text"""
         if not text:
@@ -38,43 +23,229 @@ class JobDataPreprocessor:
             tech_keywords = {
                 # Programming Languages
                 'python', 'java', 'javascript', 'typescript', 'php', 'ruby', 'go',
-                'c++', 'c#', 'swift', 'kotlin', 'rust', 'scala',
+                'c++', 'c#', 'swift', 'kotlin', 'rust', 'scala', 'c', 'perl', 'haskell',
+                'lua', 'dart', 'groovy', 'r', 'matlab', 'julia', 'cobol', 'fortran',
+                'assembly', 'prolog', 'erlang', 'elixir', 'clojure', 'f#', 'vb.net', 'golang'
                 
                 # Web Technologies
                 'html', 'css', 'sass', 'less', 'webpack', 'babel', 'npm', 'yarn',
+                'pnpm', 'vite', 'rollup', 'parcel', 'grunt', 'gulp', 'browserify',
+                'webassembly', 'pwa', 'web components', 'websocket', 'graphql', 'rest',
                 
                 # Frameworks & Libraries
                 'react', 'angular', 'vue', 'django', 'flask', 'spring', 'laravel',
                 'express', 'node.js', 'next.js', 'nuxt.js', 'flutter', 'rails',
+                'svelte', 'remix', 'gatsby', 'fastapi', 'nest.js', 'strapi',
+                'asp.net core', 'symfony', 'codeigniter', 'yii', 'cake php',
+                'backbone.js', 'ember.js', 'meteor', 'jquery', 'bootstrap', 'tailwind',
+                'material-ui', 'chakra-ui', 'ant design', 'redux', 'mobx', 'vuex', 'pinia',
                 
-                # Databases
+                # Databases & Storage
                 'sql', 'mysql', 'postgresql', 'mongodb', 'redis', 'elasticsearch',
-                'oracle', 'sqlite', 'nosql',
+                'oracle', 'sqlite', 'nosql', 'cassandra', 'couchdb', 'mariadb',
+                'dynamodb', 'firebase', 'neo4j', 'influxdb', 'cockroachdb', 'supabase',
+                'planetscale', 's3', 'minio', 'graphql', 'prisma', 'sequelize', 'typeorm',
                 
                 # Cloud & DevOps
                 'aws', 'azure', 'gcp', 'docker', 'kubernetes', 'jenkins', 'ci/cd',
-                'git', 'github', 'gitlab', 'bitbucket',
+                'git', 'github', 'gitlab', 'bitbucket', 'terraform', 'ansible', 'puppet',
+                'chef', 'prometheus', 'grafana', 'elk stack', 'nginx', 'apache',
+                'cloudflare', 'vercel', 'netlify', 'heroku', 'digitalocean', 'vagrant',
+                'github actions', 'travis ci', 'circle ci', 'argocd', 'helm',
+                
+                # AI/ML & Data Science
+                'tensorflow', 'pytorch', 'keras', 'scikit-learn', 'pandas', 'numpy',
+                'matplotlib', 'seaborn', 'jupyter', 'hadoop', 'spark', 'kafka',
+                'airflow', 'dbt', 'tableau', 'power bi', 'opencv', 'nltk', 'spacy',
+                
+                # Testing & QA
+                'jest', 'mocha', 'cypress', 'selenium', 'junit', 'pytest', 'phpunit',
+                'karma', 'jasmine', 'cucumber', 'postman', 'swagger', 'testng',
+                'robot framework', 'appium', 'jmeter', 'k6', 'playwright',
+                
+                # Mobile Development
+                'android', 'ios', 'react native', 'flutter', 'xamarin', 'ionic',
+                'swift ui', 'jetpack compose', 'kotlin multiplatform', 'capacitor',
+                'cordova', 'objective-c', 'android studio', 'xcode',
+                
+                # Security
+                'oauth', 'jwt', 'https', 'ssl/tls', 'encryption', 'authentication',
+                'authorization', 'penetration testing', 'owasp', 'cybersecurity',
+                'firewall', 'vpn', 'identity management', 'keycloak', 'auth0',
                 
                 # Methodologies & Concepts
                 'agile', 'scrum', 'kanban', 'tdd', 'rest', 'api', 'microservices',
-                'mvc', 'oop', 'functional programming',
+                'mvc', 'oop', 'functional programming', 'domain driven design',
+                'clean architecture', 'solid principles', 'design patterns',
+                'event sourcing', 'cqrs', 'serverless', 'jamstack', 'clean code',
                 
                 # Tools & Others
                 'jira', 'confluence', 'slack', 'trello', 'postman', 'swagger',
-                'linux', 'unix', 'windows', 'macos',
+                'linux', 'unix', 'windows', 'macos', 'vs code', 'intellij', 'eclipse',
+                'sublime text', 'vim', 'docker desktop', 'powershell', 'bash',
+                'zsh', 'tmux', 'homebrew', 'apt', 'yum', 'chocolatey',
                 
                 # Soft Skills & Business
                 'leadership', 'teamwork', 'communication', 'problem solving',
-                'analytical', 'project management', 'agile', 'scrum'
+                'analytical', 'project management', 'agile', 'scrum', 'time management',
+                'critical thinking', 'collaboration', 'presentation', 'negotiation',
+                'stakeholder management', 'business analysis', 'product management',
+                'technical writing', 'mentoring', 'consulting', 'client relations'
             }
             
             # Job-specific keywords
             job_keywords = {
+                # Job Levels & Positions
                 'junior', 'senior', 'lead', 'manager', 'architect', 'consultant',
+                'intern', 'trainee', 'entry level', 'mid level', 'principal', 'staff',
+                'director', 'vp', 'cto', 'cio', 'head of', 'chief', 'specialist',
+                'administrator', 'analyst', 'associate', 'coordinator', 'supervisor',
+                
+                # Employment Types
                 'full-time', 'part-time', 'remote', 'onsite', 'hybrid',
-                'startup', 'enterprise', 'product', 'service',
-                'development', 'engineering', 'testing', 'deployment',
-                'maintenance', 'support', 'design', 'implementation'
+                'contract', 'permanent', 'temporary', 'freelance', 'internship',
+                'apprenticeship', 'seasonal', 'project-based', 'fixed-term',
+                
+                # Company Types
+                'startup', 'enterprise', 'product', 'service', 'agency', 'consulting',
+                'corporation', 'non-profit', 'government', 'public sector', 'private sector',
+                'multinational', 'small business', 'medium enterprise', 'fortune 500',
+                
+                # Job Functions
+                'development', 'engineering', 'testing', 'deployment', 'maintenance',
+                'support', 'design', 'implementation', 'research', 'analysis',
+                'architecture', 'operations', 'security', 'infrastructure', 'networking',
+                'database', 'cloud', 'devops', 'sre', 'quality assurance', 'ui/ux',
+                
+                # Role Types
+                'frontend', 'backend', 'full stack', 'mobile', 'web', 'desktop',
+                'embedded', 'systems', 'data science', 'machine learning', 'ai',
+                'blockchain', 'iot', 'game development', 'ar/vr', 'cloud native',
+                
+                # Responsibilities
+                'coding', 'programming', 'debugging', 'optimization', 'documentation',
+                'mentoring', 'training', 'planning', 'estimation', 'review',
+                'monitoring', 'troubleshooting', 'integration', 'migration', 'scaling',
+                
+                # Industry Sectors
+                'fintech', 'healthtech', 'edtech', 'e-commerce', 'social media',
+                'gaming', 'telecommunications', 'cybersecurity', 'automotive',
+                'aerospace', 'manufacturing', 'retail', 'logistics', 'media',
+                
+                # Work Environment
+                'agile environment', 'fast-paced', 'collaborative', 'innovative',
+                'cross-functional', 'international', 'multicultural', 'flexible',
+                'dynamic', 'team-oriented', 'self-managed', 'deadline-driven',
+                
+                # Benefits & Perks
+                'competitive salary', 'equity', 'stock options', 'health insurance',
+                'retirement plan', 'paid time off', 'professional development',
+                'training budget', 'flexible hours', 'work-life balance',
+                
+                # Required Qualities
+                'problem solver', 'team player', 'self-motivated', 'detail-oriented',
+                'analytical', 'creative', 'innovative', 'proactive', 'adaptable',
+                'independent', 'organized', 'leadership', 'communication skills',
+                
+                # Experience Requirements
+                'entry-level', 'mid-career', 'experienced', 'expert',
+                '0-2 years', '2-5 years', '5-8 years', '8+ years', '10+ years',
+                'proven track record', 'hands-on experience', 'background in',
+                
+                # Education
+                'bachelor', 'master', 'phd', 'degree', 'certification',
+                'computer science', 'software engineering', 'information technology',
+                'bootcamp', 'self-taught', 'professional certification',
+                
+                # Location Types
+                'office-based', 'work from home', 'flexible location',
+                'relocation', 'travel required', 'multiple locations',
+                'headquarters', 'regional office', 'global', 'local'
+            }
+            
+            # Majors and Fields of Study
+            majors = {
+                # Computer & Software Engineering
+                'computer science', 'information technology', 'software engineering',
+                'computer engineering', 'informatics', 'information systems',
+                'software development', 'programming', 'web development',
+                'mobile development', 'game development', 'systems engineering',
+                
+                # Data & Analytics
+                'data science', 'machine learning', 'artificial intelligence',
+                'big data', 'data analytics', 'business analytics',
+                'data engineering', 'statistical computing', 'computational science',
+                'business intelligence', 'predictive analytics', 'data mining',
+                
+                # Specialized Computing
+                'cloud computing', 'edge computing', 'distributed systems',
+                'parallel computing', 'quantum computing', 'high performance computing',
+                'grid computing', 'fog computing', 'serverless computing',
+                
+                # Networks & Security
+                'networking', 'network engineering', 'telecommunications',
+                'cybersecurity', 'information security', 'network security',
+                'computer networks', 'wireless communications', 'network administration',
+                'ethical hacking', 'digital forensics', 'cryptography',
+                
+                # Database & Information Management
+                'database management', 'database administration', 'data warehousing',
+                'information management', 'knowledge management', 'content management',
+                'records management', 'enterprise data management', 'master data management',
+                
+                # Systems & Infrastructure
+                'systems administration', 'infrastructure management', 'devops',
+                'site reliability engineering', 'platform engineering', 'system integration',
+                'enterprise architecture', 'technical architecture', 'solutions architecture',
+                
+                # Emerging Technologies
+                'blockchain', 'internet of things', 'augmented reality',
+                'virtual reality', 'mixed reality', 'robotics',
+                'autonomous systems', 'embedded systems', '5g technologies',
+                'edge computing', 'quantum technology', 'nanotechnology',
+                
+                # Digital Media & Design
+                'digital media', 'multimedia', 'interactive media',
+                'digital design', 'user interface design', 'user experience design',
+                'web design', 'digital animation', 'game design',
+                'computer graphics', '3d modeling', 'visual computing',
+                
+                # Business & Management Information Systems
+                'management information systems', 'business informatics',
+                'information resource management', 'it service management',
+                'enterprise systems', 'business process management',
+                'digital transformation', 'technology management',
+                
+                # Applied Computing
+                'bioinformatics', 'computational biology', 'health informatics',
+                'medical informatics', 'environmental informatics', 'geoinformatics',
+                'computational physics', 'computational chemistry', 'computational linguistics',
+                
+                # Mathematics & Theoretical Computer Science
+                'computational mathematics', 'mathematical computing',
+                'theoretical computer science', 'algorithms', 'computational theory',
+                'discrete mathematics', 'applied mathematics', 'operations research',
+                
+                # Software Quality & Testing
+                'software quality assurance', 'quality engineering',
+                'test automation', 'performance engineering',
+                'reliability engineering', 'software verification',
+                
+                # Project & Product Management
+                'software project management', 'product management',
+                'agile management', 'digital product management',
+                'it project management', 'technical program management',
+                
+                # Related Engineering Fields
+                'electronic engineering', 'electrical engineering',
+                'mechatronics', 'automation engineering',
+                'control systems', 'industrial automation',
+                
+                # Interdisciplinary Fields
+                'cognitive science', 'human-computer interaction',
+                'computational social science', 'digital humanities',
+                'educational technology', 'information science',
+                'knowledge engineering', 'systems science'
             }
             
             # Convert text to lowercase for matching
@@ -95,28 +266,34 @@ class JobDataPreprocessor:
                 if keyword in text_lower
             )
             
+            # Add majors and fields of study found in text
+            found_keywords.update(
+                keyword for keyword in majors 
+                if keyword in text_lower
+            )
+            
             # Extract additional keywords using regex patterns
             # Look for words that might be important but not in our predefined sets
-            additional_patterns = [
-                # Camel case words (likely technical terms)
-                r'[a-z]+[A-Z][a-zA-Z]*',
-                # Words with dots (e.g., package names)
-                r'\b[\w-]+\.[\w-]+(?:\.[\w-]+)*\b',
-                # Words with version numbers
-                r'\b[\w-]+\s*\d+(?:\.\d+)*\b',
-                # Capitalized words (likely proper nouns)
-                r'\b[A-Z][a-zA-Z]+\b'
-            ]
+            # additional_patterns = [
+            #     # Camel case words (likely technical terms)
+            #     r'[a-z]+[A-Z][a-zA-Z]*',
+            #     # Words with dots (e.g., package names)
+            #     r'\b[\w-]+\.[\w-]+(?:\.[\w-]+)*\b',
+            #     # Words with version numbers
+            #     r'\b[\w-]+\s*\d+(?:\.\d+)*\b',
+            #     # Capitalized words (likely proper nouns)
+            #     r'\b[A-Z][a-zA-Z]+\b'
+            # ]
             
-            for pattern in additional_patterns:
-                matches = re.findall(pattern, text)
-                found_keywords.update(match.lower() for match in matches)
+            # for pattern in additional_patterns:
+            #     matches = re.findall(pattern, text)
+            #     found_keywords.update(match.lower() for match in matches)
             
-            # Remove very short keywords and common words
-            common_words = {'the', 'and', 'or', 'in', 'at', 'to', 'for', 'of', 'with'}
-            keywords = {k for k in found_keywords if len(k) > 2 and k not in common_words}
+            # # Remove very short keywords and common words
+            # common_words = {'the', 'and', 'or', 'in', 'at', 'to', 'for', 'of', 'with'}
+            # keywords = {k for k in found_keywords if len(k) > 2 and k not in common_words}
             
-            return sorted(list(keywords))
+            return sorted(list(found_keywords))
             
         except Exception as e:
             print(f"Warning: Error extracting keywords: {str(e)}")
@@ -127,30 +304,12 @@ class JobDataPreprocessor:
         try:
             processed_job = {
                 # Basic Info
-                'id': self._generate_job_id(),
-                'title': self._clean_text(job.get('title', '')),
-                'company': self._clean_text(job.get('company', '')),
-                'link': job.get('link', ''),
-                'posted_date': self._standardize_date(job.get('posted_date')),
+                'posted_date': self._convert_date(job.get('posted_date')),
                 
-                # Location
-                'location': self._process_location(job.get('location', '')),
-                
-                'is_remote': job.get('is_remote', False),
-                
-                # Requirements
-                'requirements': {
-                    'education': self._extract_education(job.get('description', '')),
-                    'experience_years': self._extract_experience_years(job.get('description', '')),
-                },
-                
-                # Skills
-                'skills': self._extract_all_skills(job.get('description', '')),
-
                 # Processed Text
                 'processed_text': {
                     'keywords': self._extract_keywords(job.get('description', '')),
-                    'clean_description': self._clean_text(job.get('description', '')),
+                    'description': job.get('description', ''),
                 }
             }
             return processed_job
@@ -158,170 +317,30 @@ class JobDataPreprocessor:
             print(f"Error preprocessing job: {str(e)}")
             # Return minimal job data instead of raw job
             return {
-                'id': self._generate_job_id(),
-                'title': job.get('title', ''),
-                'company': job.get('company', ''),
-                'link': job.get('link', ''),
-                'description': job.get('description', ''),
-                'location': job.get('location', ''),
-                'posted_date': job.get('posted_date', '')
+                'posted_date': job.get('posted_date', ''),
+                'processed_text': job.get('processed_text', {}),
             }
     
-    def _generate_job_id(self) -> str:
-        """Generate unique job ID"""
-        return str(uuid.uuid4())
-    
-    def _clean_text(self, text: str) -> str:
-        """Clean text from special characters and extra spaces"""
-        if not text:
-            return ""
-        text = re.sub(r'<[^>]+>', '', text)  # Remove HTML tags
-        text = re.sub(r'\s+', ' ', text)      # Remove extra spaces
-        return text.strip()
-    
-    def _standardize_date(self, date_str: Optional[str]) -> str:
-        """Standardize date format to ISO"""
-        if not date_str:
-            return ""
-        try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-            return date_obj.isoformat()
-        except:
-            return date_str
-    
-    def _process_location(self, location: str) -> Dict[str, str]:
-        """Process location information"""
-        location_info = {
-            'address': location,
-            'is_remote': self._detect_remote_work(location)
-        }
+    def _convert_date(self, text: str) -> str:
+        """ Convert date string to ISO format
+        Ex: '1 year' -> '2023-01-01'
+        """
         
-        return location_info
-    
-    def _detect_remote_work(self, text: str) -> bool:
-        """Detect if job is remote"""
-        remote_indicators = {'remote', 'work from home', 'wfh', 'remote-first', 'fully remote'}
-        return any(indicator in text.lower() for indicator in remote_indicators)
-    
-    
-    def _convert_to_number(self, value: str) -> float:
-        """Convert string number to float, handling different formats"""
-        try:
-            # Remove currency symbols and separators
-            clean_value = re.sub(r'[^\d.]', '', value)
-            return float(clean_value)
-        except:
-            return None
-    
-    def _detect_experience_level(self, text: str) -> str:
-        """Detect experience level from job description"""
-        text_lower = text.lower()
+        result = re.search(r'(\d+) (year|month|week|day)s?', text)
+        if result:
+            value = int(result.group(1))
+            unit = result.group(2)
+            if unit == 'year':
+                # should be like this 2023-01-01
+                return (datetime.now() - timedelta(days=365 * value)).strftime('%Y-%m-%d')
+            elif unit == 'month':
+                return (datetime.now() - timedelta(days=30 * value)).strftime('%Y-%m-%d')
+            elif unit == 'week':
+                return (datetime.now() - timedelta(days=7 * value)).strftime('%Y-%m-%d')
+            elif unit == 'day':
+                return (datetime.now() - timedelta(days=value)).strftime('%Y-%m-%d')
         
-        patterns = {
-            'entry': [
-                r'0-2 years?', r'fresh graduate', r'entry level',
-                r'junior', r'pemula', r'fresh', r'graduate'
-            ],
-            'mid': [
-                r'2-5 years?', r'3-5 years?', r'mid level',
-                r'intermediate', r'middle', r'experienced'
-            ],
-            'senior': [
-                r'5\+? years?', r'senior', r'lead', r'manager',
-                r'expert', r'principal', r'architect'
-            ]
-        }
-        
-        for level, pattern_list in patterns.items():
-            if any(re.search(pattern, text_lower) for pattern in pattern_list):
-                return level
-                
-        return 'not_specified'
-    
-    def _extract_all_skills(self, text: str) -> Dict[str, List[str]]:
-        """Extract all types of skills from text"""
-        text_lower = text.lower()
-        skills = {
-            'skills': [],
-        }
-        
-        for category, skill_set in self.skills_dict.items():
-            skills[category] = [
-                skill for skill in skill_set 
-                if skill in text_lower
-            ]
-            
-        return skills
-    
-    def _extract_soft_skills(self, text: str) -> List[str]:
-        """Extract soft skills from text"""
-        soft_skills = {
-            'communication', 'leadership', 'teamwork', 'problem solving',
-            'analytical', 'creative', 'initiative', 'detail oriented',
-            'time management', 'adaptability', 'collaboration'
-        }
-        
-        text_lower = text.lower()
-        return [skill for skill in soft_skills if skill in text_lower]
-    
-    def _extract_education(self, text: str) -> List[str]:
-        """Extract education requirements"""
-        education_patterns = [
-            r"bachelor'?s?\s+degree",
-            r"master'?s?\s+degree",
-            r"ph\.?d",
-            r"s1",
-            r"s2",
-            r"diploma",
-            r"sarjana",
-            r"magister"
-            r"sma",
-            r"smk"
-        ]
-        
-        found_education = []
-        text_lower = text.lower()
-        
-        for pattern in education_patterns:
-            if re.search(pattern, text_lower):
-                found_education.append(pattern.replace(r'\.?', '.'))
-            else:
-                found_education.append("sma")
-        return found_education
-    
-    def _extract_experience_years(self, text: str) -> Dict:
-        """Extract years of experience requirement"""
-        experience = {
-            'min': None,
-        }
-        
-        # Pattern untuk mencari requirement pengalaman
-        patterns = [
-            r'(\d+)(?:-(\d+))?\s*(?:years?|tahun)',
-            r'minimal\s*(\d+)\s*(?:years?|tahun)',
-            r'at\s*least\s*(\d+)\s*(?:years?|tahun)'
-        ]
-        
-        text_lower = text.lower()
-        
-        for pattern in patterns:
-            match = re.search(pattern, text_lower)
-            if match:
-                experience['min'] = int(match.group(1))
-            else:
-                experience['min'] = 0
-        return experience
-    
-    def _extract_languages(self, text: str) -> List[str]:
-        """Extract required languages"""
-        languages = {
-            'english', 'indonesian', 'mandarin', 'japanese',
-            'korean', 'french', 'german', 'spanish'
-        }
-        
-        text_lower = text.lower()
-        return [lang for lang in languages if lang in text_lower]
-    
+        return None
     
 def save_to_json(jobs: List[Dict], filename: str):
     """Save jobs data to JSON file"""

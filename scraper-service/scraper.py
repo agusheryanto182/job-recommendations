@@ -85,80 +85,6 @@ class LinkedInJobScraper:
                 
         return all_jobs
 
-    def get_job_description(self, job_url: str) -> str:
-        """
-        Mengambil deskripsi pekerjaan dari halaman detail
-        
-        Args:
-            job_url: URL halaman detail pekerjaan
-            
-        Returns:
-            Job description text
-        """
-        try:
-            response = requests.get(job_url, headers=self.headers, timeout=30)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                description = soup.find('div', {'class': 'show-more-less-html__markup'})
-                if description:
-                    return description.get_text(strip=True).replace('\n', ' ')
-            return ""
-        except Exception as e:
-            print(f"Error fetching description: {str(e)}")
-            return ""
-        
-    def get_job_details(self, job_url: str) -> Dict:
-        """
-        Mengambil detail pekerjaan dari halaman detail
-        """
-        details = {
-            'workplace_type': '',
-            'employment_type': '',
-            'skills': [],
-            'requirements': []
-        }
-        
-        try:
-            response = requests.get(job_url, headers=self.headers, timeout=30)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                
-                # Cari button dengan class job-details-preferences-and-skills
-                skills_section = soup.find('button', {'class': 'job-details-preferences-and-skills'})
-                print(f"Found skills section: {skills_section}")
-                
-                if skills_section:
-                    # Cari semua div dengan class job-details-preferences-and-skills__pill
-                    pills = skills_section.find_all('div', {
-                        'class': 'job-details-preferences-and-skills__pill'
-                    })
-                    
-                    for pill in pills:
-                        # Cari span dengan class ui-label text-body-small
-                        label = pill.find('span', {'class': 'ui-label text-body-small'})
-                        if label:
-                            text = label.text.strip()
-                            print(f"Found pill text: {text}")  # Debug line
-                            
-                            # Kategorikan text
-                            text_lower = text.lower()
-                            if any(word in text_lower for word in ['on-site', 'remote', 'hybrid']):
-                                details['workplace_type'] = text
-                            elif any(word in text_lower for word in ['full-time', 'part-time', 'contract', 'internship']):
-                                details['employment_type'] = text
-                            elif any(word in text_lower for word in ['skill', 'proficient', 'experience']):
-                                details['skills'].append(text)
-                            else:
-                                details['requirements'].append(text)
-                
-                print(f"Found details: {details}")
-                
-        except Exception as e:
-            print(f"Error fetching job details: {str(e)}")
-            print(f"Error type: {type(e).__name__}")
-        
-        return details
-    
     def _get_list_ids(self, soup: BeautifulSoup) -> List[str]:
         id_list = []
         page_jobs = soup.find_all("li")
@@ -174,21 +100,36 @@ class LinkedInJobScraper:
         id_list = self._get_list_ids(soup)
         for job_id in id_list:
             try:
-                print(f"Processing job ID: {job_id}")
                 job_url = f"https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{job_id}"
                 job_response = requests.get(job_url)
                 job_soup = BeautifulSoup(job_response.text, 'html.parser')
                 
                 # Extract basic job information
+                raw_job = {
+                    'posted_date':  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip(),
+                    'description': job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip(),
+                }
+                
+                try:
+                    raw_job['num_applicants'] = job_soup.find("span", {"class": "num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet"}).text.strip()
+                except:
+                    raw_job['num_applicants'] = job_soup.find("figcaption", {"class": "num-applicants__caption"}).text.strip()
+                    
+                # Process job data using our preprocessor
+                processed_job = self.preprocessor.preprocess_job(raw_job)
+                
+                # Structure the final job data
                 final_job = {
                     "job_id": job_id,
                     'title': job_soup.find("h2", {"class":"top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title"}).text.strip(),
                     'company': job_soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip(),
                     'location': job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip(),
                     'link': job_soup.find('a', {'class': 'topcard__link'}).get('href'),
-                    'posted_date':  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip(),
-                    'description': job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip(),
+                    'posted_date': processed_job['posted_date'],
+                    'processed_text': processed_job['processed_text']
                 }
+                
+                print(f"Processing job: {final_job['title']}")
                 
                 criteria_list = job_soup.find("ul", {"class": "description__job-criteria-list"})
                 if criteria_list:
@@ -207,43 +148,6 @@ class LinkedInJobScraper:
                     final_job['employment_level'] = "Not Applicable"
                     final_job['job_function'] = "Not Applicable"
                     final_job['industries'] = "Not Applicable"
-                
-                try:
-                    final_job['num_applicants'] = job_soup.find("span", {"class": "num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet"}).text.strip()
-                except:
-                    final_job['num_applicants'] = job_soup.find("figcaption", {"class": "num-applicants__caption"}).text.strip()
-                    
-                # # Get detailed job description
-                # print(f"Fetching description for: {raw_job['title']}")
-                # description = self.get_job_description(raw_job['link'])
-                
-                # # Add description to raw job data
-                # raw_job['description'] = description
-                
-                # job_details = self.get_job_details(raw_job['link'])
-                
-                # # Process job data using our preprocessor
-                # processed_job = self.preprocessor.preprocess_job(raw_job)
-                
-                # # Structure the final job data
-                # final_job = {
-                #     'id': processed_job['id'],
-                #     'title': processed_job['title'],
-                #     'company': processed_job['company'],
-                #     'link': processed_job['link'],
-                #     'posted_date': processed_job['posted_date'],
-                #     'location': {
-                #     'full_location': raw_job['location'],
-                #     'workplace_type': job_details['workplace_type']  # remote/onsite/hybrid
-                #     },
-                #     'job_type': {
-                #     'employment_type': job_details['employment_type']  # full-time/part-time/etc
-                #     },
-                #     'is_remote': processed_job['is_remote'],
-                #     'requirements': processed_job['requirements'],
-                #     'skills': processed_job['skills'],
-                #     'processed_text': processed_job['processed_text']
-                # }
                 
                 jobs.append(final_job)
                 
