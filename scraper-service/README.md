@@ -11,10 +11,9 @@ Tool untuk mengumpulkan data lowongan kerja dari LinkedIn.
    ```
 
 2. Jalankan scraper:
-   ```python
-   from src.scraper import LinkedInScraper
-   scraper = LinkedInScraper()
-   df = scraper.scrape_jobs("data scientist", "Indonesia")
+
+   ```python3 scraper.py
+
    ```
 
 ## Features
