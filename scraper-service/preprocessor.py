@@ -298,15 +298,32 @@ class JobDataPreprocessor:
         except Exception as e:
             print(f"Warning: Error extracting keywords: {str(e)}")
             return []
+        
+    def _standardize_detail_job(self, text:str) -> str:
+        """_summary_
+        Ex: 'seniority_level' : 'Not Applicable' -> 'seniority_level': 'Entry level'
+        Ex: 'employment_level' : 'Not Applicable' -> 'employment_level': 'Full-time'
+        Ex: 'job_function' : 'Not Applicable' -> 'job_function': 'Engineering and Information Technology'
+        Ex: 'industries' : 'Not Applicable' -> 'industries': 'Software Development'
+        """
+        text = text.lower()
+        text = text.replace('not applicable', 'entry level')
+        text = text.replace('not applicable', 'full-time')
+        text = text.replace('not applicable', 'engineering and information technology')
+        text = text.replace('not applicable', 'software development')
+        return text
     
     def preprocess_job(self, job: Dict) -> Dict:
         """Preprocess job data into a better structure"""
         try:
             processed_job = {
-                # Basic Info
                 'posted_date': self._convert_date(job.get('posted_date')),
+                'location': job.get('location', ''),
+                'seniority_level': self._standardize_detail_job(job.get('seniority_level', '')),
+                'employment_level': self._standardize_detail_job(job.get('employment_level', '')),
+                'job_function': self._standardize_detail_job(job.get('job_function', '')),
+                'industries': self._standardize_detail_job(job.get('industries', '')),
                 
-                # Processed Text
                 'processed_text': {
                     'keywords': self._extract_keywords(job.get('description', '')),
                     'description': job.get('description', ''),
@@ -320,7 +337,7 @@ class JobDataPreprocessor:
                 'posted_date': job.get('posted_date', ''),
                 'processed_text': job.get('processed_text', {}),
             }
-    
+            
     def _convert_date(self, text: str) -> str:
         """ Convert date string to ISO format
         Ex: '1 year' -> '2023-01-01'

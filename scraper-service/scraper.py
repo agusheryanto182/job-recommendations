@@ -106,30 +106,10 @@ class LinkedInJobScraper:
                 
                 # Extract basic job information
                 raw_job = {
+                    'location': job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip(),
                     'posted_date':  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip(),
                     'description': job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip(),
                 }
-                
-                try:
-                    raw_job['num_applicants'] = job_soup.find("span", {"class": "num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet"}).text.strip()
-                except:
-                    raw_job['num_applicants'] = job_soup.find("figcaption", {"class": "num-applicants__caption"}).text.strip()
-                    
-                # Process job data using our preprocessor
-                processed_job = self.preprocessor.preprocess_job(raw_job)
-                
-                # Structure the final job data
-                final_job = {
-                    "job_id": job_id,
-                    'title': job_soup.find("h2", {"class":"top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title"}).text.strip(),
-                    'company': job_soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip(),
-                    'location': job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip(),
-                    'link': job_soup.find('a', {'class': 'topcard__link'}).get('href'),
-                    'posted_date': processed_job['posted_date'],
-                    'processed_text': processed_job['processed_text']
-                }
-                
-                print(f"Processing job: {final_job['title']}")
                 
                 criteria_list = job_soup.find("ul", {"class": "description__job-criteria-list"})
                 if criteria_list:
@@ -139,15 +119,35 @@ class LinkedInJobScraper:
                                 for item in criteria_items]
                         
                         if all(spans):
-                            final_job['seniority_level'] = spans[0].text.strip()
-                            final_job['employment_level'] = spans[1].text.strip()
-                            final_job['job_function'] = spans[2].text.strip()
-                            final_job['industries'] = spans[3].text.strip()
+                            raw_job['seniority_level'] = spans[0].text.strip()
+                            raw_job['employment_level'] = spans[1].text.strip()
+                            raw_job['job_function'] = spans[2].text.strip()
+                            raw_job['industries'] = spans[3].text.strip()
                 else:
-                    final_job['seniority_level'] = "Not Applicable"
-                    final_job['employment_level'] = "Not Applicable"
-                    final_job['job_function'] = "Not Applicable"
-                    final_job['industries'] = "Not Applicable"
+                    raw_job['seniority_level'] = "Entry level"
+                    raw_job['employment_level'] = "Full-time"
+                    raw_job['job_function'] = "Engineering and Information Technology"
+                    raw_job['industries'] = "Information Technology & Services"
+                    
+                # Process job data using our preprocessor
+                processed_job = self.preprocessor.preprocess_job(raw_job)
+                
+                # Structure the final job data
+                final_job = {
+                    "job_id": job_id,
+                    'title': job_soup.find("h2", {"class":"top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title"}).text.strip(),
+                    'company': job_soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip(),
+                    'link': job_soup.find('a', {'class': 'topcard__link'}).get('href'),
+                    'posted_date': processed_job['posted_date'],
+                    'processed_text': processed_job['processed_text']
+                }
+                
+                try:
+                    final_job['num_applicants'] = job_soup.find("span", {"class": "num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet"}).text.strip()
+                except:
+                    final_job['num_applicants'] = job_soup.find("figcaption", {"class": "num-applicants__caption"}).text.strip()
+                
+                print(f"Processing job: {final_job['title']}")
                 
                 jobs.append(final_job)
                 
