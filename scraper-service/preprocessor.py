@@ -313,12 +313,26 @@ class JobDataPreprocessor:
         text = text.replace('not applicable', 'software development')
         return text
     
+    def _standardize_location(self, text:str) -> Dict:
+        """_summary_
+        Ex: 'location' : 'Cimahi, Bandung, Indonesia' -> 
+        Res:    'city': 'Cimahi'
+                'province': 'Bandung'
+                'country': 'Indonesia'
+        """
+        return {
+            'city': text.split(',')[0],
+            'province': text.split(',')[1],
+            'country': text.split(',')[2],
+        }
+        
+        
     def preprocess_job(self, job: Dict) -> Dict:
         """Preprocess job data into a better structure"""
         try:
             processed_job = {
                 'posted_date': self._convert_date(job.get('posted_date')),
-                'location': job.get('location', ''),
+                'location': self._standardize_location(job.get('location', '')),
                 'seniority_level': self._standardize_detail_job(job.get('seniority_level', '')),
                 'employment_level': self._standardize_detail_job(job.get('employment_level', '')),
                 'job_function': self._standardize_detail_job(job.get('job_function', '')),

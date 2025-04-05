@@ -137,6 +137,11 @@ class LinkedInJobScraper:
                     "job_id": job_id,
                     'title': job_soup.find("h2", {"class":"top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title"}).text.strip(),
                     'company': job_soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip(),
+                    'location': processed_job['location'],
+                    'seniority_level': processed_job['seniority_level'],
+                    'employment_level': processed_job['employment_level'],
+                    'job_function': processed_job['job_function'],
+                    'industries': processed_job['industries'],
                     'link': job_soup.find('a', {'class': 'topcard__link'}).get('href'),
                     'posted_date': processed_job['posted_date'],
                     'processed_text': processed_job['processed_text']
