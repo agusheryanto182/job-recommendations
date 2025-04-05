@@ -167,7 +167,7 @@ class LinkedInJobScraper:
             job_id = base_card_div.get("data-entity-urn").split(":")[3]
             id_list.append(job_id)
         return id_list
-
+    
     def _extract_jobs(self, soup: BeautifulSoup) -> List[Dict]:
         jobs = []
         
@@ -189,6 +189,24 @@ class LinkedInJobScraper:
                     'posted_date':  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip(),
                     'description': job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip(),
                 }
+                
+                criteria_list = job_soup.find("ul", {"class": "description__job-criteria-list"})
+                if criteria_list:
+                    criteria_items = criteria_list.find_all("li", {"class": "description__job-criteria-item"})
+                    if len(criteria_items) >= 4:
+                        spans = [item.find("span", {"class": ["description__job-criteria-text", "description__job-criteria-text--criteria"]}) 
+                                for item in criteria_items]
+                        
+                        if all(spans):
+                            final_job['seniority_level'] = spans[0].text.strip()
+                            final_job['employment_level'] = spans[1].text.strip()
+                            final_job['job_function'] = spans[2].text.strip()
+                            final_job['industries'] = spans[3].text.strip()
+                else:
+                    final_job['seniority_level'] = "Not Applicable"
+                    final_job['employment_level'] = "Not Applicable"
+                    final_job['job_function'] = "Not Applicable"
+                    final_job['industries'] = "Not Applicable"
                 
                 try:
                     final_job['num_applicants'] = job_soup.find("span", {"class": "num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet"}).text.strip()
