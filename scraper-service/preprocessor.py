@@ -8,8 +8,6 @@ class JobDataPreprocessor:
     def __init__(self):
         """
         Initialize JobDataPreprocessor object
-
-        This is a no-op, but it's included for consistency with other classes.
         """
         pass
             
