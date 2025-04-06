@@ -74,7 +74,9 @@ class LinkedInJobScraper:
                                 print(f"No more jobs found on page {page + 1}")
                                 break
                                 
-                            all_jobs.extend(jobs)
+                            existing_jobs = {job['job_id'] for job in all_jobs}
+                            unique_jobs = [job for job in jobs if job['job_id'] not in existing_jobs]
+                            all_jobs.extend(unique_jobs)
                             print(f"Successfully scraped page {page + 1}, Total jobs: {len(all_jobs)}")
                             
                             # Delay untuk menghindari rate limiting
@@ -114,19 +116,23 @@ class LinkedInJobScraper:
                 raw_job = {}
                 
                 try:
-                    raw_job['location']= job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip()
+                    tempLocation = job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip()
+                    if tempLocation.split(',').__len__() > 2:
+                        raw_job['location'] = tempLocation
+                    else:
+                        break
                 except:
-                    raw_job['location'] = None
+                    break
                 
                 try:
                     raw_job['posted_date'] =  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip()
                 except:
-                    raw_job['posted_date'] = None
+                    break
                 
                 try:
                     raw_job['description'] = job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip()
                 except:
-                    raw_job['description'] = None
+                    break
                 
                 criteria_list = job_soup.find("ul", {"class": "description__job-criteria-list"})
                 if criteria_list:

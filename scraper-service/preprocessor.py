@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 import json
 import csv
-from location_standardizer import LocationChecker
 
 class JobDataPreprocessor:
     def __init__(self):
@@ -12,8 +11,8 @@ class JobDataPreprocessor:
 
         This is a no-op, but it's included for consistency with other classes.
         """
-        self.location_standardizer = LocationChecker()
-        
+        pass
+            
     def _extract_keywords(self, text: str) -> List[str]:
         """Extract important keywords from text"""
         if not text:
@@ -23,10 +22,10 @@ class JobDataPreprocessor:
             # Common tech keywords to look for
             tech_keywords = {
                 # Programming Languages
-                'python', 'java', 'javascript', 'typescript', 'php', 'ruby', 'go',
-                'c++', 'c#', 'swift', 'kotlin', 'rust', 'scala', 'c', 'perl', 'haskell',
-                'lua', 'dart', 'groovy', 'r', 'matlab', 'julia', 'cobol', 'fortran',
-                'assembly', 'prolog', 'erlang', 'elixir', 'clojure', 'f#', 'vb.net', 'golang'
+                'python', 'java', 'javascript', 'typescript', 'php', 'ruby',
+                'c++', 'c#', 'swift', 'kotlin', 'rust', 'scala', 'perl', 'haskell',
+                'lua', 'dart', 'groovy', 'matlab', 'julia', 'cobol', 'fortran',
+                'assembly', 'prolog', 'erlang', 'elixir', 'clojure', 'vb.net', 'golang'
                 
                 # Web Technologies
                 'html', 'css', 'sass', 'less', 'webpack', 'babel', 'npm', 'yarn',
@@ -120,8 +119,8 @@ class JobDataPreprocessor:
                 
                 # Role Types
                 'frontend', 'backend', 'full stack', 'mobile', 'web', 'desktop',
-                'embedded', 'systems', 'data science', 'machine learning', 'ai',
-                'blockchain', 'iot', 'game development', 'ar/vr', 'cloud native',
+                'embedded', 'systems', 'data science', 'machine learning', 
+                'blockchain', 'iot', 'game development', 'ar/vr', 'cloud native', 'deep learning', 'artificial intelligence', 'programmer',
                 
                 # Responsibilities
                 'coding', 'programming', 'debugging', 'optimization', 'documentation',
@@ -371,7 +370,7 @@ class JobDataPreprocessor:
         try:
             processed_job = {
                 'posted_date': self._convert_date(job.get('posted_date')),
-                # 'location': self.location_standardizer.standardize_location(job.get('location', '')),
+                'location': self._standardize_location(job.get('location', '')),
                 'seniority_level': self._standardize_detail_job(job.get('seniority_level', '')),
                 'employment_level': self._standardize_detail_job(job.get('employment_level', '')),
                 'job_function': self._standardize_detail_job(job.get('job_function', '')),
@@ -382,20 +381,6 @@ class JobDataPreprocessor:
                     'description': job.get('description', ''),
                 }
             }
-            
-            tempLocation = job.get('location')
-            if tempLocation.split(',').__len__() > 2:
-                processed_job['location'] = self._standardize_location(tempLocation)
-            elif tempLocation.split(',').__len__() == 2:
-                locations = tempLocation.split(',')
-                locationType1 = self.location_standardizer.check_location_type(locations[0])
-                locationType2 = self.location_standardizer.check_location_type(locations[1])
-                if locationType1 == 'city' and locationType2 == 'country':
-                    resProvince = self.location_standardizer.
-                    processed_job['location'] = {
-                        'city': locations[0],
-                        'country': locations[1]
-                    }
             
             return processed_job
         except Exception as e:
