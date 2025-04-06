@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 import json
 import csv
+from location_standardizer import LocationChecker
 
 class JobDataPreprocessor:
     def __init__(self):
@@ -11,7 +12,7 @@ class JobDataPreprocessor:
 
         This is a no-op, but it's included for consistency with other classes.
         """
-        pass
+        self.location_standardizer = LocationChecker()
         
     def _extract_keywords(self, text: str) -> List[str]:
         """Extract important keywords from text"""
@@ -301,38 +302,76 @@ class JobDataPreprocessor:
         
     def _standardize_detail_job(self, text:str) -> str:
         """_summary_
-        Ex: 'seniority_level' : 'Not Applicable' -> 'seniority_level': 'Entry level'
-        Ex: 'employment_level' : 'Not Applicable' -> 'employment_level': 'Full-time'
-        Ex: 'job_function' : 'Not Applicable' -> 'job_function': 'Engineering and Information Technology'
-        Ex: 'industries' : 'Not Applicable' -> 'industries': 'Software Development'
+        Standardize job details by handling various forms of missing/invalid value
+        
+        Args:
+            text (str): input text to standardize
+
+        Returns:
+            None if text is empty/invalid, otherwise standardized text
+        
+        Examples:
+            'Not Applicable' -> None
+            'N/A' -> None
+            'Not Available' -> None
+            '' -> None
+            'Entry Level' -> 'entry level'
         """
-        text = text.lower()
-        text = text.replace('not applicable', 'entry level')
-        text = text.replace('not applicable', 'full-time')
-        text = text.replace('not applicable', 'engineering and information technology')
-        text = text.replace('not applicable', 'software development')
-        return text
+        
+        try: 
+            # Handle None or empty string
+            if not text or not isinstance(text, str):
+                return None
+            
+            # Standardize text
+            text = text.lower().strip()
+            
+            invalid_values = [
+                'not applicable', 'n/a', 'not available', '', 'n/a', '-', 'not specified', 'none'
+            ]
+            
+            # check if text is one of the invalid values
+            if text in invalid_values or text == '':
+                return None
+            
+            return text
+        except Exception as e:
+            print(f"Warning: Error standardizing job details: {str(e)}")
+            return None
+            
     
     def _standardize_location(self, text:str) -> Dict:
         """_summary_
-        Ex: 'location' : 'Cimahi, Bandung, Indonesia' -> 
-        Res:    'city': 'Cimahi'
-                'province': 'Bandung'
-                'country': 'Indonesia'
+        Standardize location format with None for missing values
         """
-        return {
-            'city': text.split(',')[0],
-            'province': text.split(',')[1],
-            'country': text.split(',')[2],
+        default_result ={
+            'city': None,
+            'province': None,
+            'country': None
         }
-        
+        try:
+            if not text or not isinstance(text, str):
+                return default_result
+            
+            parts = [part.strip() for part in text.split(',')]
+            
+            result = {
+                'city' : parts[0] if len(parts) > 0 and parts[0] else None,
+                'province' : parts[1] if len(parts) > 1 and parts[1] else None,
+                'country' : parts[2] if len(parts) > 2 and parts[2] else None,
+            }
+            
+            return result
+        except Exception as e:
+            print(f"Warning: Error standardizing location: {str(e)}")
+            return default_result
         
     def preprocess_job(self, job: Dict) -> Dict:
         """Preprocess job data into a better structure"""
         try:
             processed_job = {
                 'posted_date': self._convert_date(job.get('posted_date')),
-                'location': self._standardize_location(job.get('location', '')),
+                # 'location': self.location_standardizer.standardize_location(job.get('location', '')),
                 'seniority_level': self._standardize_detail_job(job.get('seniority_level', '')),
                 'employment_level': self._standardize_detail_job(job.get('employment_level', '')),
                 'job_function': self._standardize_detail_job(job.get('job_function', '')),
@@ -343,6 +382,21 @@ class JobDataPreprocessor:
                     'description': job.get('description', ''),
                 }
             }
+            
+            tempLocation = job.get('location')
+            if tempLocation.split(',').__len__() > 2:
+                processed_job['location'] = self._standardize_location(tempLocation)
+            elif tempLocation.split(',').__len__() == 2:
+                locations = tempLocation.split(',')
+                locationType1 = self.location_standardizer.check_location_type(locations[0])
+                locationType2 = self.location_standardizer.check_location_type(locations[1])
+                if locationType1 == 'city' and locationType2 == 'country':
+                    resProvince = self.location_standardizer.
+                    processed_job['location'] = {
+                        'city': locations[0],
+                        'country': locations[1]
+                    }
+            
             return processed_job
         except Exception as e:
             print(f"Error preprocessing job: {str(e)}")
@@ -356,6 +410,9 @@ class JobDataPreprocessor:
         """ Convert date string to ISO format
         Ex: '1 year' -> '2023-01-01'
         """
+        
+        if not text:
+            return None
         
         result = re.search(r'(\d+) (year|month|week|day)s?', text)
         if result:

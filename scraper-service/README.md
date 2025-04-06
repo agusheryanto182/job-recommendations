@@ -8,12 +8,13 @@ Tool untuk mengumpulkan data lowongan kerja dari LinkedIn.
 
    ```bash
    pip install -r requirements.txt
+   python -m spacy download en_core_web_sm
    ```
 
 2. Jalankan scraper:
 
-   ```python3 scraper.py
-
+   ```bash
+   python3 scraper.py
    ```
 
 ## Features

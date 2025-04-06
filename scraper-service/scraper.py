@@ -10,7 +10,6 @@ class LinkedInJobScraper:
     
     def __init__(self):
         self.base_url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
-        self.detail_url = "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting"
         
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -24,7 +23,7 @@ class LinkedInJobScraper:
             print(f"Error initializing preprocessor: {str(e)}")
             raise
     
-    def get_jobs(self, keywords: str, location: str, max_pages: int = 10) -> List[Dict]:
+    def get_jobs(self, keywords: str, locations: str, max_pages: int = 10) -> List[Dict]:
         """
         Mengambil data pekerjaan dari LinkedIn berdasarkan keywords dan lokasi
         
@@ -38,50 +37,57 @@ class LinkedInJobScraper:
         """
         all_jobs = []
         
-        print(f"\nStarting job search for: {keywords} in {location}")
-        print("This might take a while...\n")
+        # convert keywords to List[Dict]
+        keywords = keywords.lower()
+        keywords = [word.strip() for word in keywords.split(",")]
         
-        for page in range(max_pages):
-            start = page * 25  # LinkedIn menampilkan 25 job per halaman
-            
-            params = {
-                'keywords': keywords,
-                'location': location,
-                'start': start
-            }
-            
-            try:
-                print(f"Fetching page {page + 1}...")
-                response = requests.get(
-                    self.base_url,
-                    headers=self.headers,
-                    params=params,
-                    timeout=30
-                )
-                
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, 'html.parser')
-                    jobs = self._extract_jobs(soup)
+        # convert location to List[Dict]
+        locations = locations.lower()
+        locations = [word.strip() for word in locations.split(",")]
+        
+        for location in locations:
+            for keyword in keywords:
+                print(f"\nStarting job search for: {keyword} in {location}")
+                print("This might take a while...\n")
+                for page in range(max_pages):
+                    start = page * 10
+                    params = {
+                        'keywords': keyword,
+                        'location': location,
+                        'start': start
+                    }
                     
-                    if not jobs:  # Tidak ada lagi pekerjaan yang ditemukan
-                        print(f"No more jobs found on page {page + 1}")
-                        break
+                    try:
+                        print(f"Fetching page {page + 1}...")
+                        response = requests.get(
+                            self.base_url,
+                            headers=self.headers,
+                            params=params,
+                            timeout=30
+                        )
                         
-                    all_jobs.extend(jobs)
-                    print(f"Successfully scraped page {page + 1}, Total jobs: {len(all_jobs)}")
-                    
-                    # Delay untuk menghindari rate limiting
-                    time.sleep(1)
-                else:
-                    print(f"Failed to fetch page {page + 1}: Status code {response.status_code}")
-                    break
-                    
-            except requests.exceptions.RequestException as e:
-                print(f"Network error on page {page + 1}: {str(e)}")
-                break
-            except Exception as e:
-                print(f"Unexpected error on page {page + 1}: {str(e)}")
-                break
+                        if response.status_code == 200:
+                            soup = BeautifulSoup(response.text, 'html.parser')
+                            jobs = self._extract_jobs(soup)
+                            
+                            if not jobs:  # Tidak ada lagi pekerjaan yang ditemukan
+                                print(f"No more jobs found on page {page + 1}")
+                                break
+                                
+                            all_jobs.extend(jobs)
+                            print(f"Successfully scraped page {page + 1}, Total jobs: {len(all_jobs)}")
+                            
+                            # Delay untuk menghindari rate limiting
+                            time.sleep(1)
+                        else:
+                            print(f"Failed to fetch page {page + 1}: Status code {response.status_code}")
+                            break
+                    except requests.exceptions.RequestException as e:
+                        print(f"Network error on page {page + 1}: {str(e)}")
+                        break
+                    except Exception as e:
+                        print(f"Unexpected error on page {page + 1}: {str(e)}")
+                        break
                 
         return all_jobs
 
@@ -105,11 +111,22 @@ class LinkedInJobScraper:
                 job_soup = BeautifulSoup(job_response.text, 'html.parser')
                 
                 # Extract basic job information
-                raw_job = {
-                    'location': job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip(),
-                    'posted_date':  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip(),
-                    'description': job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip(),
-                }
+                raw_job = {}
+                
+                try:
+                    raw_job['location']= job_soup.find('span', {'class': 'topcard__flavor topcard__flavor--bullet'}).text.strip()
+                except:
+                    raw_job['location'] = None
+                
+                try:
+                    raw_job['posted_date'] =  job_soup.find("span", {"class": "posted-time-ago__text topcard__flavor--metadata"}).text.strip()
+                except:
+                    raw_job['posted_date'] = None
+                
+                try:
+                    raw_job['description'] = job_soup.find("div", {"show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"}).text.strip()
+                except:
+                    raw_job['description'] = None
                 
                 criteria_list = job_soup.find("ul", {"class": "description__job-criteria-list"})
                 if criteria_list:
@@ -124,29 +141,45 @@ class LinkedInJobScraper:
                             raw_job['job_function'] = spans[2].text.strip()
                             raw_job['industries'] = spans[3].text.strip()
                 else:
-                    raw_job['seniority_level'] = "Entry level"
-                    raw_job['employment_level'] = "Full-time"
-                    raw_job['job_function'] = "Engineering and Information Technology"
-                    raw_job['industries'] = "Information Technology & Services"
+                    raw_job['seniority_level'] = None
+                    raw_job['employment_level'] = None
+                    raw_job['job_function'] = None
+                    raw_job['industries'] = None
                     
                 # Process job data using our preprocessor
                 processed_job = self.preprocessor.preprocess_job(raw_job)
                 
                 # Structure the final job data
-                final_job = {
-                    "job_id": job_id,
-                    'title': job_soup.find("h2", {"class":"top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title"}).text.strip(),
-                    'company': job_soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip(),
-                    'location': processed_job['location'],
-                    'seniority_level': processed_job['seniority_level'],
-                    'employment_level': processed_job['employment_level'],
-                    'job_function': processed_job['job_function'],
-                    'industries': processed_job['industries'],
-                    'link': job_soup.find('a', {'class': 'topcard__link'}).get('href'),
-                    'posted_date': processed_job['posted_date'],
-                    'processed_text': processed_job['processed_text']
-                }
+                final_job = {}
                 
+                final_job['job_id'] = job_id
+
+                try:
+                    final_job['title'] = job_soup.find("h2", {"class":"top-card-layout__title font-sans text-lg papabear:text-xl font-bold leading-open text-color-text mb-0 topcard__title"}).text.strip() 
+                except:
+                    final_job['title'] = None
+                
+                try: 
+                    final_job['company'] = job_soup.find("a", {"class": "topcard__org-name-link topcard__flavor--black-link"}).text.strip()
+                except:
+                    final_job['company'] = None
+                
+                final_job['location'] = processed_job['location']
+                
+                final_job['seniority_level'] = processed_job['seniority_level']
+                final_job['employment_level'] = processed_job['employment_level']
+                final_job['job_function'] = processed_job['job_function']
+                final_job['industries'] = processed_job['industries']
+                
+                final_job['posted_date'] = processed_job['posted_date']
+                final_job['description'] = processed_job['processed_text']['description']
+                final_job['keywords'] = processed_job['processed_text']['keywords']
+                
+                try:
+                    final_job['link'] =  job_soup.find('a', {'class': 'topcard__link'}).get('href')
+                except:
+                    final_job['link'] = None
+                    
                 try:
                     final_job['num_applicants'] = job_soup.find("span", {"class": "num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet"}).text.strip()
                 except:
@@ -167,6 +200,51 @@ class LinkedInJobScraper:
                 continue
                 
         return jobs
+    
+def get_user_input():
+    """
+    Get and validate user input with better defaults and error handling
+    """
+    try:
+        # Keywords input with validation
+        while True:
+            keywords = input("Enter job keywords, you can input multiple keywords, ex: 'developer, scientist, engineer' (default: 'developer'): ").strip()
+            if not keywords:
+                keywords = "developer"
+            if len(keywords) >= 2: 
+                break
+            print("Keywords must be at least 2 characters!")
+
+        # Location input with validation
+        location = input("Enter location, you can also input multiple locations, ex: 'indonesia, japan, singapore' (default: 'indonesia'): ").strip() or "indonesia"
+        
+        # Max pages input with validation
+        while True:
+            try:
+                max_pages_input = input("Enter maximum pages to scrape (default: 1): ").strip()
+                if not max_pages_input:
+                    max_pages = 1
+                    break
+                max_pages = int(max_pages_input)
+                if max_pages > 0:
+                    break
+                print("Please enter a positive number!")
+            except ValueError:
+                print("Please enter a valid number!")
+        
+        return {
+            "keywords": keywords,
+            "location": location,
+            "max_pages": max_pages
+        }
+    except Exception as e:
+        print(f"Error in input: {str(e)}")
+        # Return default values if error
+        return {
+            "keywords": "developer",
+            "location": "indonesia",
+            "max_pages": 1
+        }
 
 def main():
     """Main function untuk menjalankan scraper"""
@@ -190,16 +268,19 @@ def main():
         # Initialize scraper
         scraper = LinkedInJobScraper()
         
-        # Get user input
-        keywords = input("Enter job keywords (default: 'developer'): ") or "developer"
-        location = input("Enter location (default: 'indonesia'): ") or "indonesia"
-        max_pages = int(input("Enter maximum pages to scrape (default: 1): ") or "1")
+        # Get validated input
+        input_params = get_user_input()
         
-        # Start scraping
+        print("\nStarting scraper with:")
+        print(f"Keywords: {input_params['keywords']}")
+        print(f"Location: {input_params['location'] or 'All locations'}")
+        print(f"Max Pages: {input_params['max_pages']}")
+        
+        # Start scraping with validated inputs
         jobs = scraper.get_jobs(
-            keywords=keywords,
-            location=location,
-            max_pages=max_pages
+            keywords=input_params['keywords'],
+            locations=input_params['location'],
+            max_pages=input_params['max_pages']
         )
         
         if jobs:
