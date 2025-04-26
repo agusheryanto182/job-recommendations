@@ -1,0 +1,65 @@
+services:
+  job-recommendation-mysql:
+    container_name: job-recommendation-mysql
+    image: mysql:latest
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - job-recommendation-mysql-data:/var/lib/mysql
+    networks:
+      - job-recommendation-network
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ../backend/auth-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../backend/auth-service:/app
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+    ports:
+      - "8081:8080"
+    networks:
+      - job-recommendation-network
+
+  # cv-service:
+  #   build: ./cv-service
+  #   container_name: cv-service
+  #   ports:
+  #     - "8082:8080"
+  #   networks:
+  #     - job-recommendation-network
+
+  job-recommendation-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: job-recommendation-phpmyadmin
+    env_file:
+      - .env
+    environment:
+      - PMA_HOST=job-recommendation-mysql
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+      - PMA_ARBITRARY=1
+    ports:
+      - 8080:80
+    networks:
+      - job-recommendation-network
+
+networks:
+  job-recommendation-network:
+    driver: bridge
+
+volumes:
+  job-recommendation-mysql-data:
