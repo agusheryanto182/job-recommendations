@@ -34,13 +34,25 @@ services:
     networks:
       - job-recommendation-network
 
-  # cv-service:
-  #   build: ./cv-service
-  #   container_name: cv-service
-  #   ports:
-  #     - "8082:8080"
-  #   networks:
-  #     - job-recommendation-network
+  cv-service:
+    container_name: cv-service
+    build:
+      context: ../backend/cv-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../backend/cv-service:/app
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+    ports:
+      - "8082:8080"
+    networks:
+      - job-recommendation-network
 
   job-recommendation-phpmyadmin:
     image: phpmyadmin/phpmyadmin
