@@ -1,0 +1,22 @@
+# Development stage
+FROM golang:1.24-alpine
+
+RUN apk add --no-cache \
+    git \
+    bash \
+    curl \
+    make && \
+    go install github.com/air-verse/air@latest
+
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+ENTRYPOINT go mod download && ./scripts/build.sh && ./bin/migrate up && air
