@@ -1,1 +1,26 @@
-*.env
+# Environment files
+.env
+
+# Dependencies
+node_modules/
+node_modules/*
+
+# Binary files
+bin/
+bin/*
+
+# Temporary files
+tmp/*
+temp/*
+
+# Log files
+*.log
+npm-debug.log*
+
+# Build files
+dist/
+build/
+
+# IDE files
+.idea/
+.vscode/
