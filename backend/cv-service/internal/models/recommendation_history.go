@@ -58,7 +58,7 @@ func (s *SkillsJSON) Scan(value interface{}) error {
 	if !ok {
 		return nil
 	}
-	return json.Unmarshal(bytes, &s)
+	return json.Unmarshal(bytes, s)
 }
 
 type Skill struct {
