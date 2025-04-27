@@ -2,12 +2,12 @@ package routes
 
 import (
 	"cv-service/internal/controllers"
+	"cv-service/internal/grpc/client"
+	"cv-service/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterRecommendationHistoryRoutes(router fiber.Router, controller *controllers.RecommendationHistoryController) {
-	recommendationHistoryRoutes := router.Group("/recommendation_history")
-
-	recommendationHistoryRoutes.Get("/user/:user_id", controller.FindByUserID)
+func RegisterRecommendationHistoryRoutes(router fiber.Router, controller *controllers.RecommendationHistoryController, authClient *client.AuthClient) {
+	router.Get("/recommendation_history", middleware.AuthMiddleware(authClient), controller.FindByUserID)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"cv-service/config"
+	"cv-service/internal/grpc"
 	"cv-service/pkg/logger"
 	middleware "cv-service/rest/middlewares"
 	"cv-service/rest/routes"
@@ -13,6 +14,16 @@ import (
 )
 
 func main() {
+	grpcConfig := &grpc.Config{
+		AuthServiceAddress: "auth-service:50051",
+	}
+
+	clients, err := grpc.NewClients(grpcConfig)
+	if err != nil {
+		log.Fatal("Failed to create grpc clients:", err)
+	}
+	defer clients.Auth.Close()
+
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -28,7 +39,7 @@ func main() {
 	}
 	defer config.CloseDB(db)
 
-	recommendationHistoryController := InitializeRecommendationHistoryDependency(db)
+	recommendationHistoryController := InitializeRecommendationHistoryDependency(db, clients.Auth)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
@@ -37,7 +48,6 @@ func main() {
 
 	app.Use(cors.New())
 	app.Use(logger.LogrusMiddleware(log))
-	app.Use(cors.New())
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		log.Info("Health check endpoint called")
@@ -47,7 +57,7 @@ func main() {
 		})
 	})
 
-	routes.RegisterRecommendationHistoryRoutes(app, recommendationHistoryController)
+	routes.RegisterRecommendationHistoryRoutes(app, recommendationHistoryController, clients.Auth)
 
 	log.Info(fmt.Sprintf("Starting server on port %s", cfg.ServerPort))
 

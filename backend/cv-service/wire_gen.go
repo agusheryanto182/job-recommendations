@@ -8,6 +8,7 @@ package main
 
 import (
 	"cv-service/internal/controllers"
+	"cv-service/internal/grpc/client"
 	"cv-service/internal/repositories"
 	"cv-service/internal/services"
 	"github.com/google/wire"
@@ -17,10 +18,10 @@ import (
 // Injectors from wire.go:
 
 // Return pointer, not value
-func InitializeRecommendationHistoryDependency(db *gorm.DB) *controllers.RecommendationHistoryController {
+func InitializeRecommendationHistoryDependency(db *gorm.DB, authClient *client.AuthClient) *controllers.RecommendationHistoryController {
 	recommendationHistoryRepo := repositories.NewRecommendationHistoryRepo(db)
 	recommendationHistoryService := services.NewRecommendationHistoryService(recommendationHistoryRepo)
-	recommendationHistoryController := controllers.NewRecommendationHistoryController(recommendationHistoryService)
+	recommendationHistoryController := controllers.NewRecommendationHistoryController(recommendationHistoryService, authClient)
 	return recommendationHistoryController
 }
 
