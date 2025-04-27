@@ -14,4 +14,6 @@ func RegisterUserRoutes(router fiber.Router, controller *controllers.AuthControl
 	userRouter.Get("/google/callback", controller.GoogleCallback)
 
 	userRouter.Get("/profile", controller.GetUserProfile)
+	userRouter.Post("/refresh", controller.RefreshToken)
+	userRouter.Post("/logout", controller.Logout)
 }

@@ -14,12 +14,14 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.1
 	github.com/tanimutomo/sqlfile v1.0.0
+	golang.org/x/oauth2 v0.25.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gen v0.3.27
 	gorm.io/gorm v1.26.0
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect

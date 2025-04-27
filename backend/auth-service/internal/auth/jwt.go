@@ -34,7 +34,7 @@ func ParseJwt(tokenString string, guard Guard) (*MyClaims, error) {
 	claims, ok := token.Claims.(*MyClaims)
 
 	if !ok {
-		return nil, errs.NewUnauthorizedError("jwt parse error")
+		return nil, errs.NewUnauthorizedError("jwt claims error")
 	}
 
 	if err = claims.ValidateGuard(guard); err != nil {

@@ -12,6 +12,10 @@ func (e Errs) Status() int {
 	return e.StatusCode
 }
 
+func NewUnprocessableEntityError(message string) Errs {
+	return Errs{Message: message, StatusCode: 422}
+}
+
 func NewBadRequestError(message string) Errs {
 	return Errs{Message: message, StatusCode: 400}
 }
