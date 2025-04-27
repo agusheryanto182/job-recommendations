@@ -1,0 +1,30 @@
+# Ignore everything first
+*
+
+# Then allow only what we need
+!backend/auth-service/
+!backend/cv-service/
+!backend/proto/
+
+# Explicitly allow go.mod and go.sum
+!backend/auth-service/go.mod
+!backend/auth-service/go.sum
+!backend/cv-service/go.mod
+!backend/cv-service/go.sum
+
+# But still ignore these in allowed directories
+**/node_modules/
+**/vendor/
+**/.env
+**/*.log
+**/tmp/
+**/dist/
+**/build/
+**/__pycache__/
+**/*.pyc
+
+# Development
+.git/
+.github/
+.vscode/
+.idea/

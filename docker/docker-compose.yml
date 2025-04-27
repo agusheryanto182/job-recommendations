@@ -22,6 +22,8 @@ services:
     volumes:
       - ../backend/auth-service:/app
       - ../backend/proto:/app/proto
+    depends_on:
+      - job-recommendation-mysql
     env_file:
       - .env
     environment:
