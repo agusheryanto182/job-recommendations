@@ -1,4 +1,3 @@
-// pkg/config/config.go
 package config
 
 import (
@@ -25,9 +24,6 @@ type Config struct {
 	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
 	GoogleRedirectURL  string `mapstructure:"GOOGLE_REDIRECT_URL"`
-
-	// JWT Configuration
-	JWTSecretKey string `mapstructure:"JWT_SECRET_KEY"`
 }
 
 func LoadConfig() (*Config, error) {

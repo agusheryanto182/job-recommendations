@@ -22,13 +22,19 @@ func main() {
 	log := config.InitLogger(cfg)
 	log.Debug("Configuration loaded : ", cfg)
 
+	// Initialize google oauth
+	googleAuthCfg, err := config.InitGoogleAuth(cfg)
+	if err != nil {
+		log.Fatal("Failed to initialize Google OAuth:", err)
+	}
+
 	db, err := config.Initialize()
 	if err != nil {
 		log.Fatal("Failed to initialize database:", err)
 	}
 	defer config.CloseDB(db)
 
-	authController := InitializeUserDependency(db)
+	authController := InitializeUserDependency(db, googleAuthCfg)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,

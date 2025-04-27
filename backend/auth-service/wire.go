@@ -4,6 +4,7 @@
 package main
 
 import (
+	"auth-service/config"
 	"auth-service/internal/controllers"
 	"auth-service/internal/repositories"
 	"auth-service/internal/services"
@@ -19,7 +20,7 @@ var SuperSet = wire.NewSet(
 )
 
 // Return pointer ke AuthController, bukan value
-func InitializeUserDependency(db *gorm.DB) *controllers.AuthController {
+func InitializeUserDependency(db *gorm.DB, googleAuthCfg *config.GoogleOAuthConfig) *controllers.AuthController {
 	wire.Build(SuperSet)
 	return &controllers.AuthController{} // Return pointer
 }

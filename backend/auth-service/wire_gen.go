@@ -7,6 +7,7 @@
 package main
 
 import (
+	"auth-service/config"
 	"auth-service/internal/controllers"
 	"auth-service/internal/repositories"
 	"auth-service/internal/services"
@@ -17,10 +18,10 @@ import (
 // Injectors from wire.go:
 
 // Return pointer ke AuthController, bukan value
-func InitializeUserDependency(db *gorm.DB) *controllers.AuthController {
+func InitializeUserDependency(db *gorm.DB, googleAuthCfg *config.GoogleOAuthConfig) *controllers.AuthController {
 	userRepo := repositories.NewUserRepo(db)
 	authService := services.NewAuthService(userRepo)
-	authController := controllers.NewAuthController(authService)
+	authController := controllers.NewAuthController(authService, googleAuthCfg)
 	return authController
 }
 
