@@ -29,7 +29,7 @@ func (j *JobsJSON) Scan(value interface{}) error {
 	if !ok {
 		return nil
 	}
-	return json.Unmarshal(bytes, &j)
+	return json.Unmarshal(bytes, j)
 }
 
 type JobRecommendation struct {
