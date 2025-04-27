@@ -9,11 +9,12 @@ import (
 )
 
 func RegisterUserRoutes(router fiber.Router, controller *controllers.AuthController) {
+	authRouter := router.Group("/auth")
 	userRouter := router.Group("/user")
 
 	// Google OAuth routes
-	userRouter.Get("/google/login", controller.GoogleLogin)
-	userRouter.Get("/google/callback", controller.GoogleCallback)
+	authRouter.Get("/google/login", controller.GoogleLogin)
+	authRouter.Get("/google/callback", controller.GoogleCallback)
 
 	userRouter.Get("/profile", middlewares.Auth(auth.User), controller.GetUserProfile)
 	userRouter.Post("/refresh", middlewares.Auth(auth.User), controller.RefreshToken)
