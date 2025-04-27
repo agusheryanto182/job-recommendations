@@ -1,0 +1,144 @@
+name: Code Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  typescript-check:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend 
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.15.0
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: TypeScript Compile Check
+        run: npm run check-types
+
+      - name: Check Lint
+        run: npm run lint
+
+  golang-check-auth-service:
+    name: Go Build and Test (auth-service)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/auth-service
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.24.0
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-modules-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-modules-
+
+      - name: Go Build
+        run: go build ./...
+
+      # Uncomment this when ready for testing
+      # - name: Go Test
+      #   run: go test ./...
+
+  golang-check-cv-service:
+    name: Go Build and Test (cv-service)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/cv-service
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.24.0
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-modules-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-modules-
+
+      - name: Go Build
+        run: go build ./...
+
+      # Uncomment this when ready for testing
+      # - name: Go Test
+      #   run: go test ./...
+
+  # python-check-scrapper:
+  #   name: Python Syntax Check (scrapper)
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: scrapper
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.11'
+
+  #     - name: Install Dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r requirements.txt || true
+
+  #     - name: Python Syntax Check
+  #       run: python -m py_compile $(find . -name "*.py")
+
+  # python-check-model:
+  #   name: Python Syntax Check (model)
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: model
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.11'
+
+  #     - name: Install Dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r requirements.txt || true
+
+  #     - name: Python Syntax Check
+  #       run: python -m py_compile $(find . -name "*.py")
