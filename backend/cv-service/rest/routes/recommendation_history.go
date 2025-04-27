@@ -9,5 +9,5 @@ import (
 )
 
 func RegisterRecommendationHistoryRoutes(router fiber.Router, controller *controllers.RecommendationHistoryController, authClient *client.AuthClient) {
-	router.Get("/user/history", middleware.AuthMiddleware(authClient), controller.FindByUserID)
+	router.Get("/history", middleware.AuthMiddleware(authClient), controller.FindByUserID)
 }
