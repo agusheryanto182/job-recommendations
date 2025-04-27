@@ -60,6 +60,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-modules-
 
+      - name: Update go.mod for CI
+        run: sed -i 's|=> /app/proto|=> ../proto|g' go.mod
+
       - name: Go Build
         run: go build ./...
 
@@ -89,6 +92,9 @@ jobs:
           key: ${{ runner.os }}-go-modules-${{ hashFiles('**/go.mod') }}
           restore-keys: |
             ${{ runner.os }}-go-modules-
+
+      - name: Update go.mod for CI
+        run: sed -i 's|=> /app/proto|=> ../proto|g' go.mod
 
       - name: Go Build
         run: go build ./...

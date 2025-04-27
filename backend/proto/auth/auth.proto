@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package auth;
+option go_package = "github.com/agusheryanto182/job-recommendations/backend/proto/auth";
+
+service AuthService {
+    rpc ValidateRequest (ValidateRequestRequest) returns (ValidateRequestResponse);
+
+    rpc GetAuthID (GetAuthIDRequest) returns (GetAuthIDResponse);
+}
+
+message ValidateRequestRequest {
+    string token = 1;
+    string guard = 2;
+}
+
+message ValidateRequestResponse {
+    string token = 1;
+    string error = 2;
+}
+
+message GetAuthIDRequest {
+    string token = 1;
+    string guard = 2;
+}
+
+message GetAuthIDResponse {
+    string auth_id = 1;
+    string error = 2;
+}

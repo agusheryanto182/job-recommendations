@@ -1,0 +1,29 @@
+# Stage 1: Builder
+FROM golang:1.24-alpine AS builder
+RUN apk add --no-cache git make protoc protobuf-dev
+WORKDIR /build
+
+# Copy proto files
+COPY backend/proto /build/proto
+
+# Copy and download dependencies
+COPY backend/cv-service/go.mod backend/cv-service/go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY backend/cv-service/ .
+
+# Build binary
+RUN go build -o main ./cmd/server
+
+# Stage 2: Final
+FROM alpine:3.18
+WORKDIR /app
+
+# Copy only the built binary and necessary files
+COPY --from=builder /build/main .
+COPY --from=builder /build/scripts/migrate.sh ./scripts/
+COPY --from=builder /build/migrations ./migrations/
+
+EXPOSE 8080 50051
+CMD ["./main"]

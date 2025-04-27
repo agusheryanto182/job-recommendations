@@ -27,7 +27,7 @@ func ValidateRequest(c *fiber.Ctx, guard Guard) (string, error) {
 		return "", err
 	}
 
-	err = validateToken(token)
+	err = ValidateToken(token)
 	if err != nil {
 		return "", err
 	}
@@ -55,7 +55,7 @@ func InvalidateToken(token string, guard Guard) error {
 	return err
 }
 
-func validateToken(token string) error {
+func ValidateToken(token string) error {
 	invalidTokenRepo, err := getInvalidTokenRepo()
 	if err != nil {
 		return err
