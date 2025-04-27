@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/sirupsen/logrus"
 )
 
 type AuthController struct {
@@ -27,11 +26,51 @@ func NewAuthController(authService services.AuthService, googleAuthCfg *config.G
 }
 
 func (c *AuthController) RefreshToken(ctx *fiber.Ctx) error {
-	panic("implement me")
+	oldToken, err := auth.GetJwtTokenFromHeader(ctx)
+	if err != nil {
+		return errs.NewUnauthorizedError(err.Error())
+	}
+
+	claims, err := auth.ParseJwt(oldToken, auth.User)
+	if err != nil {
+		return errs.NewUnauthorizedError(err.Error())
+	}
+
+	user, err := c.authService.GetUserProfile(claims.Id)
+	if err != nil {
+		return errs.NewInternalServerError(err.Error())
+	}
+
+	newToken := auth.MakeJwt(user, auth.User)
+	if err := auth.InvalidateToken(oldToken, auth.User); err != nil {
+		return errs.NewInternalServerError(err.Error())
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "Token refreshed successfully",
+		"token":   newToken,
+		"user": fiber.Map{
+			"id":     user.ID,
+			"name":   user.Name,
+			"email":  user.Email,
+			"avatar": user.AvatarURL,
+		},
+	})
 }
 
 func (c *AuthController) Logout(ctx *fiber.Ctx) error {
-	panic("implement me")
+	token, err := auth.GetJwtTokenFromHeader(ctx)
+	if err != nil {
+		return errs.NewUnauthorizedError(err.Error())
+	}
+
+	if err := auth.InvalidateToken(token, auth.User); err != nil {
+		return errs.NewInternalServerError(err.Error())
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "Logout successful",
+	})
 }
 
 func (c *AuthController) GoogleCallback(ctx *fiber.Ctx) error {
@@ -105,7 +144,6 @@ func (c *AuthController) GoogleLogin(ctx *fiber.Ctx) error {
 
 	// redirect to google
 	url := c.googleAuthCfg.GetConfig().AuthCodeURL(state)
-	logrus.Debug("Redirecting to: ", url)
 
 	return ctx.Redirect(url)
 }
