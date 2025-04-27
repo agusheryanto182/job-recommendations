@@ -17,10 +17,11 @@ services:
   auth-service:
     container_name: auth-service
     build:
-      context: ../backend/auth-service
-      dockerfile: Dockerfile.dev
+      context: ..
+      dockerfile: backend/auth-service/Dockerfile.dev
     volumes:
       - ../backend/auth-service:/app
+      - ../backend/proto:/app/proto
     env_file:
       - .env
     environment:
@@ -29,18 +30,23 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - "8081:8080"
+      - "50051:50051"
     networks:
       - job-recommendation-network
 
   cv-service:
     container_name: cv-service
     build:
-      context: ../backend/cv-service
-      dockerfile: Dockerfile.dev
+      context: ..
+      dockerfile: backend/cv-service/Dockerfile.dev
     volumes:
       - ../backend/cv-service:/app
+      - ../backend/proto:/app/proto
+    depends_on:
+      - auth-service
     env_file:
       - .env
     environment:
@@ -69,18 +75,18 @@ services:
     networks:
       - job-recommendation-network
 
-  frontend:
-    container_name: frontend-job-recommendation
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ../frontend:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
-    networks:
-      - job-recommendation-network
+  # frontend:
+  #   container_name: frontend-job-recommendation
+  #   build:
+  #     context: ../frontend
+  #     dockerfile: Dockerfile.dev
+  #   volumes:
+  #     - ../frontend:/app
+  #     - /app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - job-recommendation-network
 
 networks:
   job-recommendation-network:
