@@ -96,18 +96,18 @@ services:
     networks:
       - job-recommendation-network
 
-  # frontend:
-  #   container_name: frontend-job-recommendation
-  #   build:
-  #     context: ../frontend
-  #     dockerfile: Dockerfile.dev
-  #   volumes:
-  #     - ../frontend:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - job-recommendation-network
+  frontend:
+    container_name: frontend-job-recommendation
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - job-recommendation-network
 
 networks:
   job-recommendation-network:
