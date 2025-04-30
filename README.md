@@ -48,6 +48,7 @@ Sistem rekomendasi pekerjaan berbasis microservices (Go, gRPC, REST, NGINX, Dock
    - Auth Service: [http://localhost:8000/auth/health](http://localhost:8000/auth/health)
    - CV Service: [http://localhost:8000/cv/health](http://localhost:8000/cv/health)
    - PHPMyAdmin: [http://localhost:8080](http://localhost:8080)
+   - Frontend: [http://localhost:3000](http://localhost:3000)
 
 ---
 
