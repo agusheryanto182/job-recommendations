@@ -3,11 +3,13 @@ import Navbar from './navbar/Navbar';
 import Banner from './banner/Banner';
 import Paket from './paket/Paket';
 
+
 const Homepage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar Section */}
       <Navbar />
+      {/* Hero Section */}
       <div className="container mx-auto px-6 py-20 flex flex-col lg:flex-row items-center justify-between gap-12">
         {/* Left Text Section */}
         <div className="flex flex-col gap-6 max-w-xl">
@@ -41,6 +43,7 @@ const Homepage = () => {
         <div className="bg-gray-300 rounded-3xl px-10 py-20 w-full max-w-lg h-[500px] text-center flex items-center justify-center">
           <button
             className="bg-white text-black font-semibold max-w-xs px-6 py-4 rounded-xl border hover:bg-gray-100 w-full">
+
             Masuk dengan Google
           </button>
         </div>
