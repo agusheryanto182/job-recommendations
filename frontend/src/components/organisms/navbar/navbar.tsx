@@ -1,10 +1,10 @@
-"use client";
-import { Logo } from "@/components/atoms/logo";
-import { NavMenu } from "@/components/molecules/nav-menu";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+'use client';
+import { Logo } from '@/components/atoms/logo';
+import { NavMenu } from '@/components/molecules/nav-menu';
+import { Button } from '@/components/ui/button';
+import { Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,8 +15,8 @@ export function Navbar() {
       setScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
@@ -26,8 +26,8 @@ export function Navbar() {
                     transition-all duration-300 ease-in-out h-16 border-2 rounded-2xl border-black backdrop-blur-md bg-background/5
                     ${
                       scrolled
-                        ? "max-w-4xl mt-4"
-                        : "max-w-7xl bg-transparent border-none"
+                        ? 'max-w-4xl mt-4'
+                        : 'max-w-7xl bg-transparent border-none'
                     }`}
       >
         <div>
@@ -72,11 +72,11 @@ export function Navbar() {
             <motion.div className="md:hidden fixed top-0 left-0 right-0 bg-black z-50 px-4 py-3">
               <motion.div
                 className="flex flex-col h-[50%] rounded-t-2xl"
-                initial={{ y: "100%" }}
+                initial={{ y: '100%' }}
                 animate={{
                   y: 0,
                   transition: {
-                    type: "spring",
+                    type: 'spring',
                     damping: 15,
                     stiffness: 200,
                     bounce: 0.25,

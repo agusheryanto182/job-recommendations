@@ -1,7 +1,7 @@
 interface LinkProps {
-  href: string
-  children: React.ReactNode
-  className?: string
+  href: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
 export function Link({ href, children, className = '' }: LinkProps) {
@@ -12,5 +12,5 @@ export function Link({ href, children, className = '' }: LinkProps) {
     >
       {children}
     </a>
-  )
+  );
 }

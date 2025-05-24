@@ -1,5 +1,5 @@
-import React from "react";
-import { LandingPageTemplate } from "@/components/templates/landing-page";
+import React from 'react';
+import { LandingPageTemplate } from '@/components/templates/landing-page';
 
 const Homepage = () => {
   return (

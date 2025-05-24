@@ -11,7 +11,7 @@ export function NavLink({ href, children, active }: NavLinkProps) {
       className={`
         relative px-4 py-2 rounded-full
         font-extrabold text-sm
-        ${active ? "text-blue-500" : "text-gray-500"}
+        ${active ? 'text-blue-500' : 'text-gray-500'}
         hover:bg-background/10
         group
       `}

@@ -1,6 +1,6 @@
-"use client";
-import { motion } from "motion/react";
-import { Target } from "lucide-react";
+'use client';
+import { motion } from 'motion/react';
+import { Target } from 'lucide-react';
 
 export function Logo() {
   return (
@@ -12,11 +12,11 @@ export function Logo() {
       <motion.div
         className="relative flex items-center justify-center p-3 rounded-xl shadow-lg"
         animate={{
-          background: "linear-gradient(45deg, #3b82f6 0%, #8b5cf6 100%)",
+          background: 'linear-gradient(45deg, #3b82f6 0%, #8b5cf6 100%)',
           transition: {
             duration: 3,
             repeat: Infinity,
-            repeatType: "reverse",
+            repeatType: 'reverse',
           },
         }}
       >

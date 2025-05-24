@@ -1,7 +1,7 @@
-import React from "react";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
-import { Logo } from "@/components/atoms/logo";
-import { Container } from "@/components/atoms/container";
+import React from 'react';
+import { Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { Logo } from '@/components/atoms/logo';
+import { Container } from '@/components/atoms/container';
 
 interface FooterProps {
   sections?: Array<{
@@ -23,48 +23,48 @@ interface FooterProps {
 
 const defaultSections = [
   {
-    title: "Product",
+    title: 'Product',
     links: [
-      { name: "Home", href: "#" },
-      { name: "Pricing", href: "#pricing" },
-      { name: "Result", href: "#result" },
+      { name: 'Home', href: '#' },
+      { name: 'Pricing', href: '#pricing' },
+      { name: 'Result', href: '#result' },
     ],
   },
   {
-    title: "Company",
+    title: 'Company',
     links: [
-      { name: "About", href: "#about" },
-      { name: "Team", href: "#team" },
-      { name: "Careers", href: "#careers" },
+      { name: 'About', href: '#about' },
+      { name: 'Team', href: '#team' },
+      { name: 'Careers', href: '#careers' },
     ],
   },
   {
-    title: "Resources",
+    title: 'Resources',
     links: [
-      { name: "Help", href: "#help" },
-      { name: "Privacy", href: "#privacy" },
-      { name: "Terms", href: "#terms" },
+      { name: 'Help', href: '#help' },
+      { name: 'Privacy', href: '#privacy' },
+      { name: 'Terms', href: '#terms' },
     ],
   },
 ];
 
 const defaultSocialLinks = [
-  { icon: <Instagram className="size-5" />, href: "#", label: "Instagram" },
-  { icon: <Facebook className="size-5" />, href: "#", label: "Facebook" },
-  { icon: <Twitter className="size-5" />, href: "#", label: "X" },
-  { icon: <Linkedin className="size-5" />, href: "#", label: "LinkedIn" },
+  { icon: <Instagram className="size-5" />, href: '#', label: 'Instagram' },
+  { icon: <Facebook className="size-5" />, href: '#', label: 'Facebook' },
+  { icon: <Twitter className="size-5" />, href: '#', label: 'X' },
+  { icon: <Linkedin className="size-5" />, href: '#', label: 'LinkedIn' },
 ];
 
 const defaultLegalLinks = [
-  { name: "Terms and Conditions", href: "#" },
-  { name: "Privacy Policy", href: "#" },
+  { name: 'Terms and Conditions', href: '#' },
+  { name: 'Privacy Policy', href: '#' },
 ];
 
 const Footer = ({
   sections = defaultSections,
-  description = "Job Matcher is a platform that helps you find the best jobs for your career.",
+  description = 'Job Matcher is a platform that helps you find the best jobs for your career.',
   socialLinks = defaultSocialLinks,
-  copyright = "© 2025 Job Matcher. All rights reserved.",
+  copyright = '© 2025 Job Matcher. All rights reserved.',
   legalLinks = defaultLegalLinks,
 }: FooterProps) => {
   return (

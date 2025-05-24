@@ -1,9 +1,9 @@
-"use client";
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { AuroraText } from "@/components/magicui/aurora-text";
-import { Container } from "@/components/atoms/container";
+'use client';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { AuroraText } from '@/components/magicui/aurora-text';
+import { Container } from '@/components/atoms/container';
 
 export function Hero() {
   return (
@@ -32,8 +32,8 @@ export function Hero() {
 
           <p className="text-gray-700 text-lg leading-relaxed relative">
             Biarkan AI kami menganalisis CV-mu dan menemukan pekerjaan yang
-            sempurna untukmu dari{" "}
-            <span className="font-semibold">ribuan lowongan teknologi</span>{" "}
+            sempurna untukmu dari{' '}
+            <span className="font-semibold">ribuan lowongan teknologi</span>{' '}
             dalam hitungan detik.
           </p>
 

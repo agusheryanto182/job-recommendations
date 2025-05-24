@@ -1,11 +1,11 @@
-import { JSX } from 'react'
+import { JSX } from 'react';
 
-type TextVariant = 'heading1' | 'heading2' | 'body' | 'small'
+type TextVariant = 'heading1' | 'heading2' | 'body' | 'small';
 
 interface TextProps {
-  variant?: TextVariant
-  children: React.ReactNode
-  className?: string
+  variant?: TextVariant;
+  children: React.ReactNode;
+  className?: string;
 }
 
 const TEXT_STYLES: Record<TextVariant, string> = {
@@ -13,14 +13,14 @@ const TEXT_STYLES: Record<TextVariant, string> = {
   heading2: 'text-2xl font-semibold',
   body: 'text-base',
   small: 'text-sm text-muted-foreground',
-} as const
+} as const;
 
 const TAG_MAPPING: Record<TextVariant, keyof JSX.IntrinsicElements> = {
   heading1: 'h1',
   heading2: 'h2',
   body: 'p',
   small: 'small',
-} as const
+} as const;
 
 /**
  * Text component for consistent typography across the application
@@ -33,9 +33,9 @@ export function Text({
   children,
   className = '',
 }: TextProps) {
-  const Tag = TAG_MAPPING[variant]
+  const Tag = TAG_MAPPING[variant];
 
   return (
     <Tag className={`${TEXT_STYLES[variant]} ${className}`}>{children}</Tag>
-  )
+  );
 }

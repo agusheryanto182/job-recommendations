@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 const Paket = () => {
   return (
@@ -15,7 +15,8 @@ const Paket = () => {
           <div className="flex justify-center mt-70">
             <button
               type="button"
-              className="text-xl bg-white hover:bg-blue-900 text-black hover:text-white font-bold py-4 px-10 rounded-xl">
+              className="text-xl bg-white hover:bg-blue-900 text-black hover:text-white font-bold py-4 px-10 rounded-xl"
+            >
               Coba Sekarang
             </button>
           </div>
@@ -32,14 +33,15 @@ const Paket = () => {
           <div className="flex justify-center mt-63">
             <button
               type="button"
-              className="text-xl bg-white hover:bg-blue-900 text-black hover:text-white font-bold py-4 px-10 rounded-xl">
+              className="text-xl bg-white hover:bg-blue-900 text-black hover:text-white font-bold py-4 px-10 rounded-xl"
+            >
               Coba Sekarang
             </button>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Paket
+export default Paket;

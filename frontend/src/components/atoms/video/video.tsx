@@ -1,24 +1,24 @@
-'use client'
-import React, { useState } from 'react'
-import dynamic from 'next/dynamic'
-import { Play } from 'lucide-react'
-import Image from 'next/image'
-import { Container } from '@/components/atoms/container'
+'use client';
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { Play } from 'lucide-react';
+import Image from 'next/image';
+import { Container } from '@/components/atoms/container';
 const ReactPlayer = dynamic(() => import('react-player'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-gray-100 animate-pulse rounded-xl" />
   ),
-})
+});
 
 interface VideoProps {
-  src: string
-  thumbnail?: string
-  className?: string
+  src: string;
+  thumbnail?: string;
+  className?: string;
 }
 
 export function Video({ src, thumbnail, className = '' }: VideoProps) {
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <>
@@ -96,5 +96,5 @@ export function Video({ src, thumbnail, className = '' }: VideoProps) {
         </div>
       )}
     </>
-  )
+  );
 }

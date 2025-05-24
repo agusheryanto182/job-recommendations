@@ -1,5 +1,5 @@
-import React from 'react'
-import { FaCheck } from 'react-icons/fa'
+import React from 'react';
+import { FaCheck } from 'react-icons/fa';
 
 const Banner = () => {
   return (
@@ -25,14 +25,15 @@ const Banner = () => {
           </h3>
         </div>
 
-        <button className="text-2xl bg-white hover:bg-blue-900 text-black hover:text-white font-bold py-4 px-6 sm:px-8 lg:px-10 rounded-xl 
-        transform transition-transform hover:translate-x-3 -translate-y-9 mr-20 focus:outline-none focus:ring-4 focus:ring-blue-300">
+        <button
+          className="text-2xl bg-white hover:bg-blue-900 text-black hover:text-white font-bold py-4 px-6 sm:px-8 lg:px-10 rounded-xl 
+        transform transition-transform hover:translate-x-3 -translate-y-9 mr-20 focus:outline-none focus:ring-4 focus:ring-blue-300"
+        >
           Ill Try It!
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Banner
-
+export default Banner;
