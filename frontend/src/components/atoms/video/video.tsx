@@ -26,6 +26,7 @@ export function Video({ src, thumbnail, className = '' }: VideoProps) {
         <div
           className={`relative aspect-video rounded-xl overflow-hidden cursor-pointer group ${className}`}
           onClick={() => setShowModal(true)}
+          aria-label="Play video"
         >
           <div className="w-full h-full bg-gray-900">
             {thumbnail ? (
