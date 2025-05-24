@@ -31,11 +31,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: TypeScript Compile Check
-        run: npm run check-types
+      - name: Validate Frontend
+        run: npm run validate
 
-      - name: Check Lint
-        run: npm run lint
+      # - name: Check Lint
+      #   run: npm run lint
 
   golang-check-auth-service:
     name: Go Build and Test (auth-service)
